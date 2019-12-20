@@ -5,16 +5,21 @@
 
 
 		
-gunzip /home/GLBRCORG/kjfisher5/Langlab/LOHreads/N5$N5\N7$N7\_read1_paired_trimmed.fastq.gz
-gunzip /home/GLBRCORG/kjfisher5/Langlab/LOHreads/N5$N5\N7$N7\_read4_paired_trimmed.fastq.gz
+
 bwa index /home/GLBRCORG/kjfisher5/Langlab/LOHreads/Illumina_shortread_pipeline/reference_files/W303_ann_swb_11-29-17.fasta
 samtools faidx /home/GLBRCORG/kjfisher5/Langlab/LOHreads/Illumina_shortread_pipeline/reference_files/W303_ann_swb_11-29-17.fasta
 # start by indexing your reference genome file 
 	
 for N5 in 02 03 04 05 06 07 08 17
 do
-	for N7 in 01 02 03 04 05 06 07 08 09 10 11 12
-	do	
+echo N5$N5
+        for N7 in 21 22 23 24 26 27 
+        do
+echo N7$N7
+
+	gunzip /home/GLBRCORG/kjfisher5/Langlab/LOHreads/N5$N5\N7$N7\_read1_paired_trimmed.fastq.gz
+	
+	gunzip /home/GLBRCORG/kjfisher5/Langlab/LOHreads/N5$N5\N7$N7\_read4_paired_trimmed.fastq.gz
 	
 	/opt/bifxapps/bwa/bwa mem -k 20 -w 100 -O 5 -E 4 /home/GLBRCORG/kjfisher5/Langlab/LOHreads/Illumina_shortread_pipeline/reference_files/W303_ann_swb_11-29-17.fasta /home/GLBRCORG/kjfisher5/Langlab/LOHreads/N5$N5\N7$N7\_read1_paired_trimmed.fastq.gz /home/GLBRCORG/kjfisher5/Langlab/LOHreads/N5$N5\N7$N7\read4_paired_trimmed.fastq.gz > /home/GLBRCORG/kjfisher5/Langlab/LOHreads/N5$N5\N7$N7\.sam
 	
