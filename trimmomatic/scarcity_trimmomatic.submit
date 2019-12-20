@@ -1,0 +1,105 @@
+##### 
+# HTCONDOR SUBMIT FILE DEMO
+#
+#  updated: 
+#   - 2018-05-07
+#  notes:
+#   - WEI/GLBRC uses shared storage; i.e. there is no requirement to pass commands that "transfer_files"
+#  htcondor manuals: http://research.cs.wisc.edu/htcondor/manual/
+#   - current version: 8.4.7
+#####
+
+
+###
+# OVERVIEW
+#
+#  about:
+#  - an example htcondor ".submit file" 
+#    - runs simple phylogenetic analysis with the RAxML program program
+#  - demonstrates and explains several fundamental htcondor options and concepts
+#    - e.g. absolute, relative paths; environment variables; compute requirements
+#
+#  to use:
+#  - log in (via ssh) to our htcondor submit node
+#     $ ssh scarcity-cm.glbrc.org
+#  - copy this file to your home directory for editing
+#  - replace the variable below, YOUR_USER_NAME, with your glbrc login id
+#  - customize the JOBNAME variable with something of your own preference
+#  (optional) 
+#    - create a new directory for your .submit file and its output
+#    - edit/add it to the INITIALDIR variable below
+#  - save any changes you've made
+#  - submit your job to htcondor
+#     run this command from the same directory as your submit file (or use it's full path)
+#     $ condor_submit htcondor_demo.submit
+#  - monitor your job
+#     $ condor_q [YOUR_USER_NAME]
+#  - review your job for changes, if it is on hold
+#     here, use a value from the ID column in the command we executed
+#     $ condor_q -analyze [ID]
+#  - see job results
+#     if your job has finished, review its LOG, OUTPUT, AND ERROR file in your INITIALDIR
+### 
+
+
+## SUBMIT FILE ENVIRONMENT VARIABLES
+# note: built-in htcondor env vars are especially helpful with repeatable/multiple jobs
+MYUSERNAME = kjfisher5
+JOBNAME = Trimmomatic
+
+
+
+## ENVIRONMENT INFO
+# "vanilla" is actually the default universe
+#   we don't need to define it here, but we can for awareness/specificity
+#  "docker" is another option
+UNIVERSE = vanilla
+# import user environment variables/settings
+#  e.g. if your user environment defines a $PATH you want, this will import it
+GETENV = true
+# define custom environment variables for your job
+#  e.g. if you only want references to the python2.7 site-packages dir, use the following
+#environment = "PYTHONPATH=/opt/bifxapps/python/lib/python2.7/site-packages/"
+requirements = OpSysandVer == "CentOS6"
+
+## JOB EXECUTION 
+# this is analogous to setting your working/output directory
+#  i.e. subsequent references in arguments, log files, etc can use relative paths
+#  this is useful if you have long paths and are referencing them many times
+#INITIALDIR = /home/glbrc.org/$(MYUSERNAME)/htcondor_demo/align/
+# use full paths for the executable!
+#  these are rarely (if ever) in the same dir as your user files, specifying versions if possible/necessary
+EXECUTABLE = /home/GLBRCORG/kjfisher5/Langlab/LOHreads/scarcity_trimmomatic.sh
+# these arguments are passed to the executable
+# use full paths if you are referencing an input file!
+#ARGUMENTS = -T 2 -m PROTCAT$(MODEL)$(FREQ) -c $(NUMCAT) -p 12345 -s $(INPUT_ALIGNMENT) -n $(JOBNAME)_$(MODEL)_$(FREQ)_CAT$(NUMCAT) -f a -x 12345 -N 100 
+# files outputted with info about the submit job`
+# "log" tracks execution info about the submitted job; this file is reused/appended to for every execution
+LOG = $(JOBNAME).log
+# "output" logs any STDOUT from execution
+OUTPUT = $(JOBNAME).output
+# "error" logs any STDERR from execution
+ERROR = $(JOBNAME).error
+
+## COMPUTE REQUIREMENTS
+# reminders:
+#  - if more resources than available are requested, the job will sit idle until such a time as they are
+#  - be kind, and keep in mind that resources are shared among everyone at the center!
+# job requires 1 cpu (typical, unless you know your job can run parallel/multiple threads)
+REQUEST_CPUS = 2
+# overrequesting memory makes a job harder to place, takes longer to do so, and blocks that memory from being available to other jobs
+REQUEST_MEMORY = 2000MB
+# tells htcondor to prefer, if available, a machine with more than 500MB of memory available
+RANK = Memory > 2000
+
+
+## SUBMIT JOB
+# queue is the last statement in the submit file
+# using QUEUE without any numbers executes only one instance
+# using QUEUE with a number (e.g. QUEUE 3) tells condor to execute three instances of your job 
+# you can also use QUEUE to specify combinations of variables/arguments to be used when executing your program
+# for example, the QUEUE below specifies the values of three variables (model, freq, and numcat) that are used in the ARGUMENTS section above
+
+QUEUE
+
+
